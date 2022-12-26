@@ -27,6 +27,14 @@ function App() {
     setFilter(event.target.value);
   };
 
+  const handleClick = (event) => {
+    const countryName = event.currentTarget.parentElement.innerText.replace(
+      ' show',
+      ''
+    );
+    setFilter(countryName);
+  };
+
   if (countriesToShow.length > 10 && filter !== '') {
     return (
       <div>
@@ -43,7 +51,7 @@ function App() {
         {countriesToShow.map((country) => {
           return (
             <div key={country.name.common}>
-              {country.name.common} <button>button</button>
+              {country.name.common} <button onClick={handleClick}>show</button>
             </div>
           );
         })}
