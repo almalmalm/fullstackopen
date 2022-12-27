@@ -2,7 +2,6 @@ import { useState } from 'react';
 import Form from './components/Form';
 import Search from './components/Filter';
 import Persons from './components/Persons';
-import axios from 'axios';
 import { useEffect } from 'react';
 import contactsService from './services/contacts';
 
@@ -20,6 +19,30 @@ const App = () => {
       .then((initialPersons) => setPersons(initialPersons));
   }, []);
 
+  const updateContact = (id, name) => {
+    const newPerson = {
+      name: name,
+      number: newNumber,
+    };
+
+    const confirm = window.confirm(
+      `${name} is already added to phonebook, replace the old number with a new one ?`
+    );
+    if (confirm) {
+      contactsService.updateContact(id, newPerson).then((updatedContact) => {
+        const oldPerson = persons.find(
+          (person) => person.id === updatedContact.id
+        );
+        const newPersons = persons.filter(
+          (person) => person.id !== oldPerson.id
+        );
+        setPersons(newPersons.concat(updatedContact));
+        setNewName('');
+        setNewNumber('');
+      });
+    }
+  };
+
   // Add new contact
   const addContact = (event) => {
     event.preventDefault();
@@ -32,15 +55,26 @@ const App = () => {
     if (newName === '' || newNumber === '') {
       alert(`Please, fill all fields`);
     } else if (persons.find(({ name }) => name === newName)) {
-      alert(`${newName} is already added to phonebook`);
-      setNewName('');
-      setNewNumber('');
+      updateContact(persons.find(({ name }) => name === newName).id, newName);
     } else {
       contactsService.createContact(newPerson).then((returnedContact) => {
         setPersons(persons.concat(returnedContact));
         setNewName('');
         setNewNumber('');
       });
+    }
+  };
+
+  //Delete contact
+  const deleteContact = (id) => {
+    const personForDelete = persons.find((person) => person.id === id);
+    const confirm = window.confirm(`Delete ${personForDelete.name} ?`);
+    if (confirm) {
+      contactsService.deleteContact(id);
+      const newPersons = persons.filter(
+        (person) => person.id !== personForDelete.id
+      );
+      setPersons(newPersons);
     }
   };
 
@@ -69,7 +103,7 @@ const App = () => {
         onSubmit={addContact}
       />
       <h3>Contacts</h3>
-      <Persons query={query} persons={persons} />
+      <Persons query={query} persons={persons} onClick={deleteContact} />
     </div>
   );
 };

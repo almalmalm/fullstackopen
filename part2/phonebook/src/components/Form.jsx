@@ -18,7 +18,7 @@ const Form = ({
           number: <input value={phoneValue} onChange={phoneOnChange} />
         </div>
         <div>
-          <button type="submit">Add</button>
+          <button type="submit">add</button>
         </div>
       </form>
     </div>

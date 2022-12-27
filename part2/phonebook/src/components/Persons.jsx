@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Persons = ({ query, persons }) => {
+const Persons = ({ query, persons, onClick }) => {
   const personToShow =
     query === ''
       ? persons
@@ -12,6 +12,7 @@ const Persons = ({ query, persons }) => {
       {personToShow.map((person) => (
         <div key={person.name}>
           {person.name} : {person.number}
+          <button onClick={() => onClick(person.id)}>delete</button>
         </div>
       ))}
     </div>
