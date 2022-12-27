@@ -33,8 +33,14 @@
     {
       "content": "dasdas",
       "date": "2022-12-27T05:25:37.192Z",
-      "important": false,
+      "important": true,
       "id": 6
+    },
+    {
+      "content": "Bye food",
+      "date": "2022-12-27T18:12:57.856Z",
+      "important": true,
+      "id": 7
     }
   ]
 }

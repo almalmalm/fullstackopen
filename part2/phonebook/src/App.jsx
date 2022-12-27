@@ -4,6 +4,7 @@ import Search from './components/Filter';
 import Persons from './components/Persons';
 import { useEffect } from 'react';
 import contactsService from './services/contacts';
+import Notification from './components/Notification';
 
 const App = () => {
   // State init
@@ -11,6 +12,7 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [query, setQuery] = useState('');
+  const [addContactMessage, setContactMessage] = useState(null);
 
   //Get all contacts
   useEffect(() => {
@@ -29,17 +31,42 @@ const App = () => {
       `${name} is already added to phonebook, replace the old number with a new one ?`
     );
     if (confirm) {
-      contactsService.updateContact(id, newPerson).then((updatedContact) => {
-        const oldPerson = persons.find(
-          (person) => person.id === updatedContact.id
-        );
-        const newPersons = persons.filter(
-          (person) => person.id !== oldPerson.id
-        );
-        setPersons(newPersons.concat(updatedContact));
-        setNewName('');
-        setNewNumber('');
-      });
+      contactsService
+        .updateContact(id, newPerson)
+        .then((updatedContact) => {
+          const oldPerson = persons.find(
+            (person) => person.id === updatedContact.id
+          );
+          const newPersons = persons.filter(
+            (person) => person.id !== oldPerson.id
+          );
+          setPersons(newPersons.concat(updatedContact));
+          setNewName('');
+          setNewNumber('');
+          setContactMessage(`Updated ${updatedContact.name}`);
+          setTimeout(() => {
+            setContactMessage(null);
+          }, 5000);
+        })
+        .catch((error) => {
+          console.log(error);
+          setContactMessage(
+            `Information of  ${
+              persons.find((person) => person.id === id).name
+            } has already been removed from server`
+          );
+          setTimeout(() => {
+            setContactMessage(null);
+          }, 5000);
+          setPersons(
+            persons.filter(
+              (person) =>
+                person.id !== persons.find((person) => person.id === id).id
+            )
+          );
+          setNewName('');
+          setNewNumber('');
+        });
     }
   };
 
@@ -61,6 +88,10 @@ const App = () => {
         setPersons(persons.concat(returnedContact));
         setNewName('');
         setNewNumber('');
+        setContactMessage(`Added ${returnedContact.name}`);
+        setTimeout(() => {
+          setContactMessage(null);
+        }, 5000);
       });
     }
   };
@@ -93,6 +124,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
+      <Notification message={addContactMessage} />
       <Search value={query} onChange={handleQuery} />
       <h3>Add a new contact</h3>
       <Form
