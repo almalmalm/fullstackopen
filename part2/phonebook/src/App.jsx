@@ -4,21 +4,23 @@ import Search from './components/Filter';
 import Persons from './components/Persons';
 import axios from 'axios';
 import { useEffect } from 'react';
+import contactsService from './services/contacts';
 
 const App = () => {
+  // State init
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [query, setQuery] = useState('');
 
-  const getPersons = () => {
-    axios.get('http://localhost:3001/persons').then((response) => {
-      setPersons(response.data);
-    });
-  };
+  //Get all contacts
+  useEffect(() => {
+    contactsService
+      .getAll()
+      .then((initialPersons) => setPersons(initialPersons));
+  }, []);
 
-  useEffect(getPersons, []);
-
+  // Add new contact
   const addContact = (event) => {
     event.preventDefault();
     const newPerson = {
@@ -26,31 +28,34 @@ const App = () => {
       number: newNumber,
     };
 
+    // Check for all fields is filled
     if (newName === '' || newNumber === '') {
       alert(`Please, fill all fields`);
     } else if (persons.find(({ name }) => name === newName)) {
       alert(`${newName} is already added to phonebook`);
       setNewName('');
-      return setNewNumber('');
-    } else {
-      setPersons(persons.concat(newPerson));
-      setNewName('');
       setNewNumber('');
+    } else {
+      contactsService.createContact(newPerson).then((returnedContact) => {
+        setPersons(persons.concat(returnedContact));
+        setNewName('');
+        setNewNumber('');
+      });
     }
   };
 
+  // Fields entering functionalities
   const handleNewNameChange = (event) => {
     setNewName(event.target.value);
   };
-
   const handleNewNumberChange = (event) => {
     setNewNumber(event.target.value);
   };
-
   const handleQuery = (event) => {
     setQuery(event.target.value);
   };
 
+  // App UI
   return (
     <div>
       <h1>Phonebook</h1>
