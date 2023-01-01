@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // base url init
-const baseUrl = 'http://localhost:3001/api/persons';
+const baseUrl = 'https://phonebook-lkalinin.onrender.com/api/persons';
 
 //Get all contacts
 const getAll = () => {
